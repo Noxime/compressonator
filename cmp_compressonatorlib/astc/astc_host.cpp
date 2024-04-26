@@ -1109,7 +1109,7 @@ int select_partition_host(int seed, int x, int y, int z, int partitioncount, int
     return partition;
 }
 
-void generate_one_partition_table(int xdim, int ydim, int zdim, int partition_count, int partition_index, partition_info * pt, __global ASTC_Encode *ASTCEncode) {
+void generate_one_partition_table(int xdim, int ydim, int zdim, int partition_count, int partition_index, partition_info * pt, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int small_block = (xdim * ydim * zdim) < 32;
 
     ASTC_Encoder::uint8_t *partition_of_texel = pt->partition_of_texel;
@@ -1168,7 +1168,7 @@ void generate_one_partition_table(int xdim, int ydim, int zdim, int partition_co
     }
 }
 
-void generate_partition_tables(int xdim, int ydim, int zdim, __global ASTC_Encode *ASTCEncode) {
+void generate_partition_tables(int xdim, int ydim, int zdim, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
     generate_one_partition_table(xdim, ydim, zdim, 1, 0, &ASTCEncode->partition_tables[1][0], ASTCEncode);
     for (i = 0; i < PARTITION_COUNT; i++) {
@@ -1181,7 +1181,7 @@ void generate_partition_tables(int xdim, int ydim, int zdim, __global ASTC_Encod
     partition_table_zap_equal_elements(xdim, ydim, zdim, &ASTCEncode->partition_tables[4][0]);
 }
 
-void prepare_angular_tables(__global ASTC_Encode *ASTCEncode) {
+void prepare_angular_tables(CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i, j;
     int max_angular_steps_needed_for_quant_steps[40];
     for (i = 0; i < ANGULAR_STEPS; i++) {
@@ -1202,7 +1202,7 @@ void prepare_angular_tables(__global ASTC_Encode *ASTCEncode) {
 
 }
 
-void build_quantization_mode_table(__global ASTC_Encode *ASTCEncode) {
+void build_quantization_mode_table(CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i, j;
     for (i = 0; i <= 16; i++)
         for (j = 0; j < 128; j++)
@@ -1248,7 +1248,7 @@ void expand_block_artifact_suppression_host(int xdim, int ydim, int zdim, error_
             }
 }
 
-void set_block_size_descriptor(int xdim, int ydim, int zdim, __global ASTC_Encode *ASTCEncode) {
+void set_block_size_descriptor(int xdim, int ydim, int zdim, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
 #ifdef ASTC_ENABLE_3D_SUPPORT
     if (zdim > 1)
         construct_block_size_descriptor_3d_host(xdim, ydim, zdim, &ASTCEncode->bsd);
@@ -1642,7 +1642,7 @@ void decode_ise(int quantization_level, int elements, const uint8_t * input_data
         output_data[i] = results[i];
 }
 
-void InitializeASTCSettingsForSetBlockSize(__global ASTC_Encode *ASTCEncode) {
+void InitializeASTCSettingsForSetBlockSize(CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     ASTCEncode->m_target_bitrate = 0;
     int xdim_2d = ASTCEncode->m_xdim;
     int ydim_2d = ASTCEncode->m_ydim;
@@ -1822,7 +1822,7 @@ void InitializeASTCSettingsForSetBlockSize(__global ASTC_Encode *ASTCEncode) {
     expand_block_artifact_suppression_host(ASTCEncode->m_xdim, ASTCEncode->m_ydim, ASTCEncode->m_zdim, &ASTCEncode->m_ewp);
 }
 
-bool init_ASTC(__global ASTC_Encode *ASTCEncode) {
+bool init_ASTC(CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     prepare_angular_tables(ASTCEncode);
     build_quantization_mode_table(ASTCEncode);
     InitializeASTCSettingsForSetBlockSize(ASTCEncode);

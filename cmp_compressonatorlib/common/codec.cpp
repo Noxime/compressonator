@@ -102,6 +102,13 @@ bool CCodec::GetParameter(const CMP_CHAR* /*pszParamName*/, CODECFLOAT& /*fValue
 //  Windows
 #define cpuid(info, x) __cpuidex(info, x, 0)
 
+#elif defined(__EMSCRIPTEN__)
+
+void cpuid(int info[4], int InfoType)
+{
+    memset(info, 0, sizeof(int) * 4);
+}
+
 #else
 
 //  GCC Intrinsics

@@ -25,10 +25,10 @@ typedef float3 afloat3;
 
 #else
 // when running kernel as cpu c++
-#define __kernel
-#define __global
-#define __constant          const
-#define __local             const
+#define CMP_KERNEL
+#define CMP_GLOBAL
+#define CMP_CONSTANT          const
+#define CMP_LOCAL             const
 
 #include "stdio.h"
 #include <math.h>
@@ -128,9 +128,9 @@ namespace ASTC_Encoder {
 
 #include "vectypes.h"
 
-#define __constant          const
-#define __kernel
-#define __global
+#define CMP_CONSTANT          const
+#define CMP_KERNEL
+#define CMP_GLOBAL
 
 #include <stdio.h>      /* printf */
 #include <math.h>       /* floor */
@@ -411,7 +411,7 @@ typedef struct {
     uint64_cl coverage_bitmaps[4];    // used for the purposes of k-means partition search.
 }  partition_info;
 
-__constant  uint8_t color_quantization_tables[21][256] = {
+CMP_CONSTANT  uint8_t color_quantization_tables[21][256] = {
     {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -792,7 +792,7 @@ __constant  uint8_t color_quantization_tables[21][256] = {
     },
 };
 
-__constant  uint8_t color_unquantization_tables[21][256] = {
+CMP_CONSTANT  uint8_t color_unquantization_tables[21][256] = {
     {
         0, 255,
     },
@@ -937,10 +937,10 @@ typedef struct {
     float percentile;
 }  block_mode;
 
-__constant  uint8_t cbytes1[8] = { 0xFC, 0xFD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+CMP_CONSTANT  uint8_t cbytes1[8] = { 0xFC, 0xFD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
-__constant  uint8_t cbytes2[8] = { 0xFC, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-//__constant  int block_mode_histogram[2048];
+CMP_CONSTANT  uint8_t cbytes2[8] = { 0xFC, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+//CMP_CONSTANT  int block_mode_histogram[2048];
 
 typedef struct {
     float4 error_weights[MAX_TEXELS_PER_BLOCK];
@@ -982,7 +982,7 @@ typedef union if32_ {
     float f;
 } if32;
 
-__constant float angular_steppings[] = {
+CMP_CONSTANT float angular_steppings[] = {
     1.0, 1.125,
     1.25, 1.375,
     1.5, 1.625,
@@ -1064,7 +1064,7 @@ typedef struct {
     uint8_t closest_quantized_weight[1025];
 } quantization_and_transfer_table;
 
-__constant quantization_and_transfer_table quant_and_xfer_tables[12] = {
+CMP_CONSTANT quantization_and_transfer_table quant_and_xfer_tables[12] = {
     // quantization method 0, range 0..1
     {
         QUANT_2,
@@ -2060,7 +2060,7 @@ __constant quantization_and_transfer_table quant_and_xfer_tables[12] = {
 
 // packed trit-value for every unpacked trit-quintuplet
 // indexed by [high][][][][low]
-__constant uint8_t integer_of_trits[3][3][3][3][3] = {
+CMP_CONSTANT uint8_t integer_of_trits[3][3][3][3][3] = {
     {
         {
             {
@@ -2224,7 +2224,7 @@ __constant uint8_t integer_of_trits[3][3][3][3][3] = {
 
 // packed quint-value for every unpacked quint-triplet
 // indexed by [high][middle][low]
-__constant uint8_t integer_of_quints[5][5][5] = {
+CMP_CONSTANT uint8_t integer_of_quints[5][5][5] = {
     {
         { 0, 1, 2, 3, 4, },
         { 8, 9, 10, 11, 12, },
@@ -2263,7 +2263,7 @@ __constant uint8_t integer_of_quints[5][5][5] = {
 };
 
 
-__constant float baseline_quant_error[21] = {
+CMP_CONSTANT float baseline_quant_error[21] = {
     (65536.0f * 65536.0f / 18.0f),              // 2 values, 1 step
     (65536.0f * 65536.0f / 18.0f) / (2 * 2),    // 3 values, 2 steps
     (65536.0f * 65536.0f / 18.0f) / (3 * 3),    // 4 values, 3 steps
@@ -2287,13 +2287,13 @@ __constant float baseline_quant_error[21] = {
     (65536.0f * 65536.0f / 18.0f) / (255 * 255)
 };
 
-__constant float rgbo_error_scales[6] = { 4.0f, 4.0f, 16.0f, 64.0f, 256.0f, 1024.0f };
-__constant float rgb_error_scales[9] = { 64.0f, 64.0f, 16.0f, 16.0f, 4.0f, 4.0f, 1.0f, 1.0f, 384.0f };
-__constant int shamts[6] = { 1, 1, 2, 3, 4, 5 };
-__constant int dbits_tab[8] = { 7, 6, 7, 6, 5, 6, 5, 6 };
+CMP_CONSTANT float rgbo_error_scales[6] = { 4.0f, 4.0f, 16.0f, 64.0f, 256.0f, 1024.0f };
+CMP_CONSTANT float rgb_error_scales[9] = { 64.0f, 64.0f, 16.0f, 16.0f, 4.0f, 4.0f, 1.0f, 1.0f, 384.0f };
+CMP_CONSTANT int shamts[6] = { 1, 1, 2, 3, 4, 5 };
+CMP_CONSTANT int dbits_tab[8] = { 7, 6, 7, 6, 5, 6, 5, 6 };
 
 /* for each possible sign/exponent combination, store a case index. This gives a 512-byte table */
-__constant  uint8_t tab[512] = {
+CMP_CONSTANT  uint8_t tab[512] = {
     0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
     10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
     10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
@@ -2331,7 +2331,7 @@ __constant  uint8_t tab[512] = {
 
 /* many of the cases below use a case-dependent magic constant. So we look up a magic constant before actually performing the switch. This table allows us to group cases, thereby minimizing code
 size. */
-__constant  uint32_t tabx[60] = {
+CMP_CONSTANT  uint32_t tabx[60] = {
     (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0x8000), (uint32_t)(0x80000000), (uint32_t)(0x8000), (uint32_t)(0x8000), (uint32_t)(0x8000),
     (uint32_t)(1), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0x8000), (uint32_t)(0x8001), (uint32_t)(0x8000), (uint32_t)(0x8000), (uint32_t)(0x8000),
     (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0), (uint32_t)(0x8000), (uint32_t)(0x8000), (uint32_t)(0x8000), (uint32_t)(0x8000), (uint32_t)(0x8000),
@@ -2351,7 +2351,7 @@ This table allows us to handle every case except denormals and NaN
 with just 1 table lookup, 2 shifts and 1 add.
 */
 
-__constant int32_t tbl[64] = {
+CMP_CONSTANT int32_t tbl[64] = {
     (int32_t)0x80000000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000,
     (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000,
     (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000, (int32_t)0x1C000,
@@ -2363,7 +2363,7 @@ __constant int32_t tbl[64] = {
 };
 
 // weight + 12
-__constant  unsigned int idxtab[256] = {
+CMP_CONSTANT  unsigned int idxtab[256] = {
 
     12, 13, 14, 15, 16, 17, 18, 19,
     20, 21, 22, 23, 24, 25, 26, 27,
@@ -2400,14 +2400,14 @@ __constant  unsigned int idxtab[256] = {
     4, 5, 6, 7, 8, 9, 10, 11
 };
 
-__constant float dummy_percentile_table_3d[2048] = { 0 };
+CMP_CONSTANT float dummy_percentile_table_3d[2048] = { 0 };
 
 // yes, the next-to-last entry is supposed to have the value 33. This because under
 // ASTC, the the 32-weight mode leaves a double-sized hole in the middle of the
 // weight space, so we are better off matching 33 weights than 32.
-__constant int steps_of_level[] = { 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 33, 36 };
+CMP_CONSTANT int steps_of_level[] = { 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 33, 36 };
 
-__constant  float quantization_step_table[12] = {
+CMP_CONSTANT  float quantization_step_table[12] = {
     1.0f / 1.0f,
     1.0f / 2.0f,
     1.0f / 3.0f,
@@ -2423,7 +2423,7 @@ __constant  float quantization_step_table[12] = {
 };
 
 // number of bits in the various fields in the various modes
-__constant int mode_bits[8][4] = {
+CMP_CONSTANT int mode_bits[8][4] = {
     { 9, 7, 6, 7 },
     { 9, 8, 6, 6 },
     { 10, 6, 7, 7 },
@@ -2436,7 +2436,7 @@ __constant int mode_bits[8][4] = {
 
 // cutoffs to use for the computed values of a,b,c,d, assuming the
 // range 0..65535 are LNS values corresponding to fp16.
-__constant  float mode_cutoffs[8][4] = {
+CMP_CONSTANT  float mode_cutoffs[8][4] = {
     { 16384, 8192, 8192, 8 },    // mode 0: 9,7,6,7
     { 32768, 8192, 4096, 8 },    // mode 1: 9,8,6,6
     { 4096, 8192, 4096, 4 },    // mode 2: 10,6,7,7
@@ -2447,7 +2447,7 @@ __constant  float mode_cutoffs[8][4] = {
     { 1024, 2048, 512, 1 },    // mode 7: 12,6,7,6
 };
 
-__constant  float mode_scales[8] = {
+CMP_CONSTANT  float mode_scales[8] = {
     1.0f / 128.0f,
     1.0f / 128.0f,
     1.0f / 64.0f,
@@ -2459,7 +2459,7 @@ __constant  float mode_scales[8] = {
 };
 
 // scaling factors when going from what was encoded in the mode to 16 bits.
-__constant  float mode_rscales[8] = {
+CMP_CONSTANT  float mode_rscales[8] = {
     128.0f,
     128.0f,
     64.0f,
@@ -2470,9 +2470,9 @@ __constant  float mode_rscales[8] = {
     16.0f
 };
 
-__constant int testbits[3] = { 0xE0, 0xF0, 0xF8 };
+CMP_CONSTANT int testbits[3] = { 0xE0, 0xF0, 0xF8 };
 
-__constant float mode_rscales2[5] = {
+CMP_CONSTANT float mode_rscales2[5] = {
     32.0f,
     32.0f,
     64.0f,
@@ -2480,7 +2480,7 @@ __constant float mode_rscales2[5] = {
     256.0f,
 };
 
-__constant int mode_bits2[5][3] = {
+CMP_CONSTANT int mode_bits2[5][3] = {
     { 11, 5, 7 },
     { 11, 6, 5 },
     { 10, 5, 8 },
@@ -2488,7 +2488,7 @@ __constant int mode_bits2[5][3] = {
     { 8, 7, 6 }
 };
 
-__constant float mode_cutoffs2[5][2] = {
+CMP_CONSTANT float mode_cutoffs2[5][2] = {
     { 1024, 4096 },
     { 2048, 1024 },
     { 2048, 16384 },
@@ -2496,7 +2496,7 @@ __constant float mode_cutoffs2[5][2] = {
     { 32768, 16384 }
 };
 
-__constant float mode_scales2[5] = {
+CMP_CONSTANT float mode_scales2[5] = {
     1.0f / 32.0f,
     1.0f / 32.0f,
     1.0f / 64.0f,
@@ -2505,7 +2505,7 @@ __constant float mode_scales2[5] = {
 };
 
 /* table used for the slow default versions. */
-__constant uint8_t clz_table[256] = {
+CMP_CONSTANT uint8_t clz_table[256] = {
     8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -2531,7 +2531,7 @@ by shifting the correct FP32 result right by 13 bits.
 This table allows us to handle every case except denormals and NaN
 with just 1 table lookup, 2 shifts and 1 add.
 */
-__constant int32_t tbl2[64] = {
+CMP_CONSTANT int32_t tbl2[64] = {
     (int32_t)(0x80000000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000),
     (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000),
     (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000), (int32_t)(0x1C000),
@@ -2543,7 +2543,7 @@ __constant int32_t tbl2[64] = {
 };
 
 // more numbers from random.org
-__constant float cluster_cutoffs[25] = {
+CMP_CONSTANT float cluster_cutoffs[25] = {
     0.952312f, 0.206893f, 0.835984f, 0.507813f, 0.466170f,
     0.872331f, 0.488028f, 0.866394f, 0.363093f, 0.467905f,
     0.812967f, 0.626220f, 0.932770f, 0.275454f, 0.832020f,
@@ -2551,15 +2551,15 @@ __constant float cluster_cutoffs[25] = {
     0.566812f, 0.347661f, 0.731960f, 0.156391f, 0.297786f
 };
 
-__constant int bits_to_write5[5] = { 2, 2, 1, 2, 1 };
-__constant int block_shift5[5] = { 0, 2, 4, 5, 7 };
-__constant int next_lcounter5[5] = { 1, 2, 3, 4, 0 };
-__constant int hcounter_incr5[5] = { 0, 0, 0, 0, 1 };
+CMP_CONSTANT int bits_to_write5[5] = { 2, 2, 1, 2, 1 };
+CMP_CONSTANT int block_shift5[5] = { 0, 2, 4, 5, 7 };
+CMP_CONSTANT int next_lcounter5[5] = { 1, 2, 3, 4, 0 };
+CMP_CONSTANT int hcounter_incr5[5] = { 0, 0, 0, 0, 1 };
 
-__constant int bits_to_write3[3] = { 3, 2, 2 };
-__constant int block_shift3[3] = { 0, 3, 5 };
-__constant int next_lcounter3[3] = { 1, 2, 0 };
-__constant int hcounter_incr3[3] = { 0, 0, 1 };
+CMP_CONSTANT int bits_to_write3[3] = { 3, 2, 2 };
+CMP_CONSTANT int block_shift3[3] = { 0, 3, 5 };
+CMP_CONSTANT int next_lcounter3[3] = { 1, 2, 0 };
+CMP_CONSTANT int hcounter_incr3[3] = { 0, 0, 1 };
 
 //=======================================================================================================================
 
@@ -2626,21 +2626,21 @@ extern void fetch_imageblock(
     astc_codec_image *input_image,
     imageblock *blk,
     unsigned int pixelcount,
-    __global ASTC_Encode *ASTC_Encode
+    CMP_GLOBAL ASTC_Encode *ASTC_Encode
 );
 
 extern float compress_symbolic_block(
     imageblock * blk,
     symbolic_compressed_block * scb,
-    __global ASTC_Encode *  ASTCEncode
+    CMP_GLOBAL ASTC_Encode *  ASTCEncode
 );
 
 extern void decompress_symbolic_block(
     symbolic_compressed_block * scb,
     imageblock * blk,
-    __global ASTC_Encode *ASTCEncode);
+    CMP_GLOBAL ASTC_Encode *ASTCEncode);
 
-extern physical_compressed_block symbolic_to_physical(symbolic_compressed_block * sc, __global ASTC_Encode *  ASTCEncode);
+extern physical_compressed_block symbolic_to_physical(symbolic_compressed_block * sc, CMP_GLOBAL ASTC_Encode *  ASTCEncode);
 
 
 

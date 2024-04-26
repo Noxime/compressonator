@@ -4,7 +4,9 @@ set(CMP_HOST_APPLE OFF)
 set(CMP_HOST_LINUX OFF)
 set(CMP_HOST_WINDOWS OFF)
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+if(EMSCRIPTEN)
+    set(CMP_HOST_LINUX ON)
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     set(CMP_HOST_APPLE ON)
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     set(CMP_HOST_LINUX ON)
@@ -13,7 +15,6 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 else()
     message(FATAL_ERROR "Unknown platform")
 endif()
-
 
 # Helper function for setting persistent CMake options
 macro(cmp_option OPTION_NAME DESCRIPTION EXPRESSION)

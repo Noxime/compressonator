@@ -26,7 +26,7 @@ namespace ASTC_Encoder {
 
 // This is tempory and will be removed
 // global2 is used to identify the ASTC_Encode arrays that need to be removed or reduced in size from OpenCL call stack!
-#define __global2           __global
+#define __global2           CMP_GLOBAL
 
 #ifndef __OPENCL_VERSION__
 #define DEBUG(x)        //printf("%s\n",x);
@@ -271,7 +271,7 @@ void imageblock_initialize_work_from_orig(imageblock * pb, int pixelcount) {
 // The updating is done based on work_data, not orig_data.
 //=========================================================================
 
-void update_imageblock_flags(imageblock * pb, __global ASTC_Encode *ASTC_Encode) {
+void update_imageblock_flags(imageblock * pb, CMP_GLOBAL ASTC_Encode *ASTC_Encode) {
     float red_min = FLOAT_38, red_max = -FLOAT_38;
     float green_min = FLOAT_38, green_max = -FLOAT_38;
     float blue_min = FLOAT_38, blue_max = -FLOAT_38;
@@ -324,7 +324,7 @@ void fetch_imageblock(
     astc_codec_image *input_image,
     imageblock *blk,
     unsigned int pixelcount,
-    __global ASTC_Encode *ASTC_Encode
+    CMP_GLOBAL ASTC_Encode *ASTC_Encode
 ) {
     //---------------------------------------------------------------
     // Convert the source RGBA byte pixels to float for ASTC
@@ -579,7 +579,7 @@ float prepare_error_weight_block(
     imageblock * blk,
     error_weight_block * ewb,
     error_weight_block_orig * ewbo,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("prepare_error_weight_block");
 
     if (ASTCEncode->m_compress_to_mono) {
@@ -786,10 +786,10 @@ float prepare_error_weight_block(
 
 void compute_partition_error_color_weightings(
     error_weight_block * ewb,
-    __global partition_info * pi,
+    CMP_GLOBAL partition_info * pi,
     float4 error_weightings[4],
     float4 color_scalefactors[4],
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_partition_error_color_weightings");
 
     int i;
@@ -814,7 +814,7 @@ void compute_partition_error_color_weightings(
 }
 
 void compute_averages_and_directions_rgba(
-    __global partition_info * pt,
+    CMP_GLOBAL partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     float4 * color_scalefactors,
@@ -906,11 +906,11 @@ void compute_averages_and_directions_rgba(
 }
 
 void compute_endpoints_and_ideal_weights_rgba(
-    __global  partition_info * pt,
+    CMP_GLOBAL  partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     endpoints_and_weights * ei,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_endpoints_and_ideal_weights_rgba");
 
     int i;
@@ -1023,7 +1023,7 @@ void compute_endpoints_and_ideal_weights_rgba(
     }
 }
 
-void compute_averages_and_directions_rgb(__global partition_info * pt,
+void compute_averages_and_directions_rgb(CMP_GLOBAL partition_info * pt,
         imageblock * blk,
         error_weight_block * ewb,
         float4 * color_scalefactors,
@@ -1107,7 +1107,7 @@ void compute_averages_and_directions_rgb(__global partition_info * pt,
     }
 }
 
-void compute_averages_and_directions_3_components(__global partition_info * pt,
+void compute_averages_and_directions_3_components(CMP_GLOBAL partition_info * pt,
         imageblock * blk,
         error_weight_block * ewb,
         float3 * color_scalefactors, int component1, int component2, int component3, float3 * averages, float3 * directions) {
@@ -1202,14 +1202,14 @@ void compute_averages_and_directions_3_components(__global partition_info * pt,
 }
 
 void compute_endpoints_and_ideal_weights_3_components(
-    __global partition_info * pt,
+    CMP_GLOBAL partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     endpoints_and_weights * ei,
     int component1,
     int component2,
     int component3,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_endpoints_and_ideal_weights_3_components");
 
     int i;
@@ -1468,11 +1468,11 @@ int imageblock_uses_alpha1(imageblock * blk) {
 }
 
 void compute_endpoints_and_ideal_weights_1_plane(
-    __global partition_info * pt,
+    CMP_GLOBAL partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     endpoints_and_weights * ei,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_endpoints_and_ideal_weights_1_plane");
     int uses_alpha = imageblock_uses_alpha1(blk);
     if (uses_alpha) {
@@ -1490,7 +1490,7 @@ void compute_angular_offsets(
     __global2 float *sample_weights,
     int max_angular_steps,
     float *offsets,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
 
     int i, j;
 
@@ -1511,8 +1511,8 @@ void compute_angular_offsets(
         p.f = (sample * (SINCOS_STEPS - 1.0f)) + 12582912.0f;
         unsigned int isample = p.u & 0x3F;
 
-        __global float *sinptr = ASTCEncode->sin_table[isample];
-        __global float *cosptr = ASTCEncode->cos_table[isample];
+        CMP_GLOBAL float *sinptr = ASTCEncode->sin_table[isample];
+        CMP_GLOBAL float *cosptr = ASTCEncode->cos_table[isample];
 
         for (j = 0; j < max_angular_steps; j++) {
             float cp = cosptr[j];
@@ -1541,7 +1541,7 @@ void compute_lowest_and_highest_weight(
     float *error,
     float *cut_low_weight_error,
     float *cut_high_weight_error,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
 
     int sp;
@@ -1665,7 +1665,7 @@ void compute_angular_endpoints_for_quantization_levels(
     int max_quantization_level,
     float low_value[12],
     float high_value[12],
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_angular_endpoints_for_quantization_levels");
 
     int i;
@@ -1779,7 +1779,7 @@ void compute_angular_endpoints_for_quantization_levels(
 }
 
 float compute_value_of_texel_flt(int texel_to_get,
-                                 __global decimation_table *it,
+                                 CMP_GLOBAL decimation_table *it,
                                  __global2 float *weights) {
     return
         ( weights[it->texel_weights[texel_to_get][0]] * it->texel_weights_float[texel_to_get][0]
@@ -1790,7 +1790,7 @@ float compute_value_of_texel_flt(int texel_to_get,
 
 float compute_value_of_texel_flt_localVar(
     int texel_to_get,
-    __global decimation_table *it,
+    CMP_GLOBAL decimation_table *it,
     float *weights) {
 
 //#ifdef __OPENCL_VERSION__
@@ -1809,7 +1809,7 @@ float compute_value_of_texel_flt_localVar(
 float compute_error_of_texel(
     endpoints_and_weights * eai,
     int texel_to_get,
-    __global decimation_table * it,
+    CMP_GLOBAL decimation_table * it,
     __global2 float *weights) {
     float current_value = compute_value_of_texel_flt(texel_to_get, it, weights);
     float valuedif = current_value - eai->weights[texel_to_get];
@@ -1818,7 +1818,7 @@ float compute_error_of_texel(
 
 float compute_error_of_weight_set(
     endpoints_and_weights * eai,
-    __global decimation_table * it,
+    CMP_GLOBAL decimation_table * it,
     __global2 float *weights) {
     int i;
     int texel_count = it->num_texels;
@@ -1830,7 +1830,7 @@ float compute_error_of_weight_set(
 
 void compute_two_error_changes_from_perturbing_weight_infill(
     endpoints_and_weights * eai,
-    __global decimation_table * it,
+    CMP_GLOBAL decimation_table * it,
     float *infilled_weights, int weight_to_perturb,
     float perturbation1, float perturbation2, float *res1, float *res2) {
     int num_weights = it->weight_num_texels[weight_to_perturb];
@@ -1855,7 +1855,7 @@ void compute_two_error_changes_from_perturbing_weight_infill(
 
 void compute_ideal_weights_for_decimation_table(
     endpoints_and_weights * eai,
-    __global decimation_table * it,
+    CMP_GLOBAL decimation_table * it,
     __global2 float *weight_set,
     __global2 float *weights) {
     DEBUG("compute_ideal_weights_for_decimation_table");
@@ -1983,7 +1983,7 @@ void compute_angular_endpoints_1plane(float mode_cutoff,
                                       __global2 float *decimated_weights,
                                       float low_value[MAX_WEIGHT_MODES],
                                       float high_value[MAX_WEIGHT_MODES],
-                                      __global ASTC_Encode *ASTCEncode) {
+                                      CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_angular_endpoints_1plane");
 
     int i;
@@ -2018,7 +2018,7 @@ void compute_angular_endpoints_1plane(float mode_cutoff,
 
 void compute_ideal_quantized_weights_for_decimation_table(
     endpoints_and_weights * eai,
-    __global decimation_table * it,
+    CMP_GLOBAL decimation_table * it,
     float low_bound, float high_bound,
     __global2 float *weight_set_in,
     __global2 float *weight_set_out,
@@ -2029,7 +2029,7 @@ void compute_ideal_quantized_weights_for_decimation_table(
     int weight_count = it->num_weights;
     int texels_per_block = it->num_texels;
 
-    __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[quantization_level]);
+    CMP_CONSTANT quantization_and_transfer_table *qat = &(quant_and_xfer_tables[quantization_level]);
 
     // quantize the weight set using both the specified low/high bounds and the
     // standard 0..1 weight bounds.
@@ -2277,16 +2277,16 @@ void recompute_ideal_colors(int weight_quantization_mode,
                             __global2 uint8_t * weight_set8,     // the current set of weight values
                             __global2 uint8_t * plane2_weight_set8,    // 0 if plane 2 is not actually used.
                             int plane2_color_component,    // color component for 2nd plane of weights; -1 if the 2nd plane of weights is not present
-                            __global partition_info * pi,
-                            __global decimation_table * it,
+                            CMP_GLOBAL partition_info * pi,
+                            CMP_GLOBAL decimation_table * it,
                             imageblock * blk,    // picture-block containing the actual data.
                             error_weight_block * ewb,
-                            __global ASTC_Encode *ASTCEncode
+                            CMP_GLOBAL ASTC_Encode *ASTCEncode
                            ) {
     DEBUG("recompute_ideal_colors");
 
     int i, j;
-    __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_mode]);
+    CMP_CONSTANT quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_mode]);
 
     float weight_set[MAX_WEIGHTS_PER_BLOCK];
     float plane2_weight_set[MAX_WEIGHTS_PER_BLOCK];
@@ -2846,7 +2846,7 @@ int imageblock_uses_alpha4(imageblock * blk) {
     return blk->alpha_max != blk->alpha_min;
 }
 
-void compute_averages_and_directions_2_components(__global partition_info * pt,
+void compute_averages_and_directions_2_components(CMP_GLOBAL partition_info * pt,
         imageblock * blk,
         error_weight_block * ewb, float2 * color_scalefactors, int component1, int component2, float2 * averages, float2 * directions) {
     int i;
@@ -2921,10 +2921,10 @@ void compute_averages_and_directions_2_components(__global partition_info * pt,
 }
 
 //static
-void compute_endpoints_and_ideal_weights_2_components( __global partition_info * pt,
+void compute_endpoints_and_ideal_weights_2_components( CMP_GLOBAL partition_info * pt,
         imageblock * blk, error_weight_block * ewb,
         endpoints_and_weights * ei, int component1, int component2,
-        __global ASTC_Encode *ASTCEncode) {
+        CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
 
     int partition_count = pt->partition_count;
@@ -3134,10 +3134,10 @@ void compute_endpoints_and_ideal_weights_2_components( __global partition_info *
 
 //static
 void compute_endpoints_and_ideal_weights_1_component(
-    __global partition_info * pt, imageblock * blk,
+    CMP_GLOBAL partition_info * pt, imageblock * blk,
     error_weight_block * ewb, endpoints_and_weights * ei,
     int component,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
 
     int partition_count = pt->partition_count;
@@ -3241,13 +3241,13 @@ void compute_endpoints_and_ideal_weights_1_component(
 }
 
 void compute_endpoints_and_ideal_weights_2_planes(
-    __global partition_info * pt,
+    CMP_GLOBAL partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     int separate_component,
     endpoints_and_weights * ei1,
     endpoints_and_weights * ei2,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int uses_alpha = imageblock_uses_alpha4(blk);
     switch (separate_component) {
     case 0:                    // separate weights for red
@@ -3289,10 +3289,10 @@ void compute_endpoints_and_ideal_weights_2_planes(
 // function to compute the error across a tile when using a particular line for
 // a particular partition.
 float compute_error_squared_rgb_single_partition(int partition_to_test,
-        __global partition_info * pt,    // the partition that we use when computing the squared-error.
+        CMP_GLOBAL partition_info * pt,    // the partition that we use when computing the squared-error.
         imageblock * blk, error_weight_block * ewb,
         processed_line3 * lin,    // the line for the partition.
-        __global ASTC_Encode *ASTCEncode
+        CMP_GLOBAL ASTC_Encode *ASTCEncode
                                                 ) {
     int i;
 
@@ -3356,10 +3356,10 @@ void merge_endpoints(endpoints * ep1,    // contains three of the color componen
 }
 
 void compute_encoding_choice_errors(
-    imageblock * pb, __global partition_info * pi, error_weight_block * ewb,
+    imageblock * pb, CMP_GLOBAL partition_info * pi, error_weight_block * ewb,
     int separate_component,    // component that is separated out in 2-plane mode, -1 in 1-plane mode
     encoding_choice_errors * eci,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
 
     int partition_count = pi->partition_count;
@@ -3530,7 +3530,7 @@ void compute_encoding_choice_errors(
 // the color error.
 //static
 void compute_color_error_for_every_integer_count_and_quantization_level(int encode_hdr_rgb,    // 1 = perform HDR encoding, 0 = perform LDR encoding.
-        int encode_hdr_alpha, int partition_index, __global partition_info * pi,
+        int encode_hdr_alpha, int partition_index, CMP_GLOBAL partition_info * pi,
         encoding_choice_errors * eci,    // pointer to the structure for the CURRENT partition.
         endpoints * ep, float4 error_weightings[4],
         // arrays to return results back through.
@@ -3811,7 +3811,7 @@ void compute_color_error_for_every_integer_count_and_quantization_level(int enco
 // for 1 partition, find the best combination (one format + a quantization level) for a given bitcount
 //static
 void one_partition_find_best_combination_for_bitcount(float combined_best_error[21][4],
-        int formats_of_choice[21][4], int bits_available, int *best_quantization_level, int *best_formats, float *error_of_best_combination, __global ASTC_Encode *ASTCEncode) {
+        int formats_of_choice[21][4], int bits_available, int *best_quantization_level, int *best_formats, float *error_of_best_combination, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
     int best_integer_count = -1;
     float best_integer_count_error = FLOAT_20;
@@ -3879,7 +3879,7 @@ void two_partitions_find_best_combination_for_bitcount(float combined_best_error
         int *best_quantization_level_mod,
         int *best_formats,
         float *error_of_best_combination,
-        __global ASTC_Encode *ASTCEncode) {
+        CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
 
     int best_integer_count = 0;
@@ -3956,7 +3956,7 @@ static void three_partitions_find_best_combination_for_every_quantization_and_in
 // 4
 static void three_partitions_find_best_combination_for_bitcount(float combined_best_error[21][10],
         int formats_of_choice[21][10][3],
-        int bits_available, int *best_quantization_level, int *best_quantization_level_mod, int *best_formats, float *error_of_best_combination, __global ASTC_Encode *ASTCEncode) {
+        int bits_available, int *best_quantization_level, int *best_quantization_level_mod, int *best_formats, float *error_of_best_combination, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
 
     int best_integer_count = 0;
@@ -4041,7 +4041,7 @@ static void four_partitions_find_best_combination_for_every_quantization_and_int
 // for 4 partitions, find the best combination (four formats + a quantization level) for a given bitcount
 static void four_partitions_find_best_combination_for_bitcount(float combined_best_error[21][13],
         int formats_of_choice[21][13][4],
-        int bits_available, int *best_quantization_level, int *best_quantization_level_mod, int *best_formats, float *error_of_best_combination, __global ASTC_Encode *ASTCEncode) {
+        int bits_available, int *best_quantization_level, int *best_quantization_level_mod, int *best_formats, float *error_of_best_combination, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i;
     int best_integer_count = -4;
     float best_integer_count_error = FLOAT_20;
@@ -4080,7 +4080,7 @@ static void four_partitions_find_best_combination_for_bitcount(float combined_be
 #endif
 
 void determine_optimal_set_of_endpoint_formats_to_use(
-    __global partition_info * pt,
+    CMP_GLOBAL partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     endpoints * ep,
@@ -4091,7 +4091,7 @@ void determine_optimal_set_of_endpoint_formats_to_use(
     int partition_format_specifiers[4][4],
     int quantized_weight[4],
     int quantization_level[4], int quantization_level_mod[4],
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     int i, j;
     int partition_count = pt->partition_count;
 
@@ -6730,7 +6730,7 @@ void unpack_color_endpoints(
     int *alpha_hdr,                         // out
     int *nan_endpoint,                      // out
     ushort4 * output0, ushort4 * output1,   // out
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("unpack_color_endpoints");
     *nan_endpoint = 0;
 
@@ -6938,7 +6938,7 @@ ushort4 lerp_color_int(
     ushort4 color0,
     ushort4 color1,
     int4 tmp_weight1,
-    __global ASTC_Encode *ASTCEncode
+    CMP_GLOBAL ASTC_Encode *ASTCEncode
 ) {
     DEBUG("lerp_color_int");
     int4 ecolor0        = { color0.x, color0.y, color0.z, color0.w };
@@ -6973,7 +6973,7 @@ ushort4 COMPUTE_LRP_COLOR(
     float                   plane1_weight,
     float                   plane2_weight,
     int                     plane2_color_component,
-    __global ASTC_Encode    *ASTCEncode
+    CMP_GLOBAL ASTC_Encode    *ASTCEncode
 ) {
     DEBUG("COMPUTE_LRP_COLOR");
     int4    tmp_weight0 = { 64,64,64,64 };
@@ -7030,8 +7030,8 @@ ushort4 COMPUTE_LRP_COLOR(
 void COMPUTE_ERROR(
     float                   *errorvar,
     int                     texels_to_evaluate,
-    __global decimation_table        *it,
-    __global partition_info          *pt,
+    CMP_GLOBAL decimation_table        *it,
+    CMP_GLOBAL partition_info          *pt,
     float                   uq_plane1_weights[MAX_WEIGHTS_PER_BLOCK],
     float                   uq_plane2_weights[MAX_WEIGHTS_PER_BLOCK],
     int                     is_dual_plane,
@@ -7041,7 +7041,7 @@ void COMPUTE_ERROR(
     imageblock              *blk,
     int                     plane2_color_component,
     error_weight_block      *ewb,
-    __global ASTC_Encode    *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode    *ASTCEncode) {
     DEBUG("COMPUTE_ERROR");
     *errorvar = 0.0f;
     for (int j = 0; j < texels_to_evaluate; j++) {
@@ -7099,7 +7099,7 @@ int realign_weights(
     symbolic_compressed_block * scb,
     __global2 uint8_t * weight_set8,
     __global2 uint8_t * plane2_weight_set8,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("realign_weights");
     int i;
 
@@ -7132,7 +7132,7 @@ int realign_weights(
     int weight_count = ASTCEncode->bsd.decimation_tables[modeindex].num_weights;
 
     // read and unquantize the weights.
-    __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
+    CMP_CONSTANT quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
 
     for (i = 0; i < weight_count; i++) {
         uq_plane1_weights[i] = qat->unquantized_value_flt[weight_set8[i]];
@@ -7360,7 +7360,7 @@ void compress_symbolic_block_fixed_partition_1_plane(
     __global2 uint8_t *u8_quantized_decimated_quantized_weights,
     __global2 float   *decimated_quantized_weights,
     __global2 float   *flt_quantized_decimated_quantized_weights,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compress_symbolic_block_fixed_partition_1_plane");
 
     int i, j, k;
@@ -7625,7 +7625,7 @@ int compute_value_of_texel_int(int texel_to_get, decimation_table * it, int *wei
     return summed_value >> 4;
 }
 
-int compute_value_of_texel_global(int texel_to_get, __global decimation_table * it, int *weights) {
+int compute_value_of_texel_global(int texel_to_get, CMP_GLOBAL decimation_table * it, int *weights) {
     int i;
     int summed_value = 8;
     int weights_to_evaluate = it->texel_num_weights[texel_to_get];
@@ -7755,7 +7755,7 @@ void imageblock_initialize_orig_from_work(imageblock * blk, int pixelcount) {
 void decompress_symbolic_block(
     symbolic_compressed_block * scb,
     imageblock * blk,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("decompress_symbolic_block");
     int i;
 
@@ -7875,7 +7875,7 @@ void decompress_symbolic_block(
     int uq_plane2_weights[MAX_WEIGHTS_PER_BLOCK];
     int weight_count = ASTCEncode->bsd.decimation_tables[ASTCEncode->bsd.block_modes[scb->block_mode].decimation_mode].num_weights;
 
-    __constant quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
+    CMP_CONSTANT quantization_and_transfer_table *qat = &(quant_and_xfer_tables[weight_quantization_level]);
 
     for (i = 0; i < weight_count; i++) {
         uq_plane1_weights[i] = qat->unquantized_value[scb->plane1_weights[i]];
@@ -7930,7 +7930,7 @@ void decompress_symbolic_block(
 }
 
 float compute_imageblock_difference(imageblock * p1, imageblock * p2, error_weight_block * ewb,
-                                    __global ASTC_Encode *ASTCEncode) {
+                                    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_imageblock_difference");
     int i;
     float summa = 0.0f;
@@ -7952,7 +7952,7 @@ float compute_imageblock_difference(imageblock * p1, imageblock * p2, error_weig
 
 // compute averages and covariance matrices for 4 components
 //static
-void compute_covariance_matrix(imageblock * blk, error_weight_block * ewb, mat4t * cov_matrix, __global ASTC_Encode *ASTCEncode) {
+void compute_covariance_matrix(imageblock * blk, error_weight_block * ewb, mat4t * cov_matrix, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_covariance_matrix");
     int i;
     float r_sum = 0.0f;
@@ -8022,7 +8022,7 @@ void prepare_block_statistics(
     error_weight_block * ewb,
     int *is_normal_map,
     float *lowest_correl,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("prepare_block_statistics");
     int i;
 
@@ -8093,7 +8093,7 @@ void compute_angular_endpoints_2planes(float mode_cutoff,
                                        float high_value1[MAX_WEIGHT_MODES],
                                        float low_value2[MAX_WEIGHT_MODES],
                                        float high_value2[MAX_WEIGHT_MODES],
-                                       __global ASTC_Encode *ASTCEncode) {
+                                       CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_angular_endpoints_2planes");
     int i;
     float low_values1[MAX_DECIMATION_MODES][12];
@@ -8149,7 +8149,7 @@ void compress_symbolic_block_fixed_partition_2_planes(
     __global2 uint8_t *u8_quantized_decimated_quantized_weights,
     __global2 float   *decimated_quantized_weights,
     __global2 float   *flt_quantized_decimated_quantized_weights,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compress_symbolic_block_fixed_partition_2_planes");
     int i, j, k;
     int free_bits_for_partition_count[5] =
@@ -8427,7 +8427,7 @@ void compress_symbolic_block_fixed_partition_2_planes(
 // just supply a handful of numbers from random.org, and apply an algorithm similar
 // to XKCD #221. (http://xkcd.com/221/)
 // cluster the texels using the k++ means clustering initialization algorithm.
-void kpp_initialize(int partition_count, imageblock * blk, float4 * cluster_centers, __global ASTC_Encode *ASTCEncode) {
+void kpp_initialize(int partition_count, imageblock * blk, float4 * cluster_centers, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("kpp_initialize");
     int i;
 
@@ -8513,7 +8513,7 @@ void kpp_initialize(int partition_count, imageblock * blk, float4 * cluster_cent
 
 // basic K-means clustering: given a set of cluster centers,
 // assign each texel to a partition
-void basic_kmeans_assign_pass(int partition_count, imageblock * blk, float4 * cluster_centers, int *partition_of_texel, __global ASTC_Encode *ASTCEncode) {
+void basic_kmeans_assign_pass(int partition_count, imageblock * blk, float4 * cluster_centers, int *partition_of_texel, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("basic_kmeans_assign_pass");
     int i, j;
 
@@ -8583,7 +8583,7 @@ void basic_kmeans_assign_pass(int partition_count, imageblock * blk, float4 * cl
 
 // basic k-means clustering: given a set of cluster assignments
 // for the texels, find the center position of each cluster.
-void basic_kmeans_update(int partition_count, imageblock * blk, int *partition_of_texel, float4 * cluster_centers, __global ASTC_Encode *ASTCEncode) {
+void basic_kmeans_update(int partition_count, imageblock * blk, int *partition_of_texel, float4 * cluster_centers, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("basic_kmeans_update");
     int i;
 
@@ -8768,7 +8768,7 @@ static inline int partition_mismatch4(uint64_cl a0, uint64_cl a1, uint64_cl a2, 
 void count_partition_mismatch_bits( int partition_count,
                                     uint64_cl bitmaps[4],
                                     int bitcounts[PARTITION_COUNT],
-                                    __global ASTC_Encode *ASTCEncode) {
+                                    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("count_partition_mismatch_bits");
     int i;
 
@@ -8846,7 +8846,7 @@ void get_partition_ordering_by_mismatch_bits(int mismatch_bits[PARTITION_COUNT],
     }
 }
 
-void kmeans_compute_partition_ordering(int partition_count, imageblock * blk, int *ordering, __global ASTC_Encode *ASTCEncode) {
+void kmeans_compute_partition_ordering(int partition_count, imageblock * blk, int *ordering, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("kmeans_compute_partition_ordering");
     int i;
     float4 cluster_centers[4];
@@ -8887,7 +8887,7 @@ void kmeans_compute_partition_ordering(int partition_count, imageblock * blk, in
 
 }
 
-float compute_error_squared_rgba(__global  partition_info * pt,    // the partition that we use when computing the squared-error.
+float compute_error_squared_rgba(CMP_GLOBAL  partition_info * pt,    // the partition that we use when computing the squared-error.
                                  imageblock * blk, error_weight_block * ewb, processed_line4 * plines, float *length_of_lines) {
     DEBUG("compute_error_squared_rgba");
     int i;
@@ -8946,7 +8946,7 @@ float compute_error_squared_rgba(__global  partition_info * pt,    // the partit
     return errorsum;
 }
 
-void compute_alpha_minmax(__global partition_info * pt, imageblock * blk, error_weight_block * ewb, float *alpha_min, float *alpha_max, __global ASTC_Encode *ASTCEncode) {
+void compute_alpha_minmax(CMP_GLOBAL partition_info * pt, imageblock * blk, error_weight_block * ewb, float *alpha_min, float *alpha_max, CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_alpha_minmax");
     int i;
     int partition_count = pt->partition_count;
@@ -8980,7 +8980,7 @@ void compute_alpha_minmax(__global partition_info * pt, imageblock * blk, error_
 
 #define TWO_COMPONENT_ERROR_FUNC( funcname, c0_iwt, c1_iwt, c01_name, c01_rname ) \
 float funcname( \
-    __global partition_info *pt, \
+    CMP_GLOBAL partition_info *pt, \
     imageblock *blk, \
     error_weight_block *ewb, \
     processed_line2 *plines, \
@@ -9049,7 +9049,7 @@ TWO_COMPONENT_ERROR_FUNC(compute_error_squared_ra, 0, 3, zw, ra)
 
 #define THREE_COMPONENT_ERROR_FUNC( funcname, c0_iwt, c1_iwt, c2_iwt, c012_name, c012_rname ) \
 float funcname( \
-    __global partition_info *pt, \
+    CMP_GLOBAL partition_info *pt, \
     imageblock *blk, \
     error_weight_block *ewb, \
     processed_line3 *plines, \
@@ -9114,13 +9114,13 @@ THREE_COMPONENT_ERROR_FUNC(compute_error_squared_rgb, 0, 1, 2, xyz, rgb)
 
 
 void compute_rgb_minmax(
-    __global partition_info * pt,
+    CMP_GLOBAL partition_info * pt,
     imageblock * blk,
     error_weight_block * ewb,
     float *red_min, float *red_max,
     float *green_min, float *green_max,
     float *blue_min, float *blue_max,
-    __global ASTC_Encode *ASTCEncode) {
+    CMP_GLOBAL ASTC_Encode *ASTCEncode) {
     DEBUG("compute_rgb_minmax");
     int i;
     int partition_count = pt->partition_count;
@@ -9175,7 +9175,7 @@ void find_best_partitionings(int partition_search_limit, int partition_count,
                              int *best_partitions_uncorrellated,     // best partitionings to use if the endpoint colors are assumed to be uncorrellated
                              int *best_partitions_samechroma,        // best partitionings to use if the endpoint colors have the same chroma
                              int *best_partitions_dual_weight_planes,// best partitionings to use if using dual plane of weightss
-                             __global ASTC_Encode *ASTCEncode) {
+                             CMP_GLOBAL ASTC_Encode *ASTCEncode) {
 //#
     DEBUG("find_best_partitionings");
     int i, j;
@@ -9780,7 +9780,7 @@ void find_best_partitionings(int partition_search_limit, int partition_count,
 float compress_symbolic_block(
     imageblock * blk,
     symbolic_compressed_block * scb,
-    __global ASTC_Encode *  ASTCEncode
+    CMP_GLOBAL ASTC_Encode *  ASTCEncode
 ) {
     DEBUG("compress_symbolic_block");
     int i, j;
@@ -10278,7 +10278,7 @@ void encode_ise(int quantization_level, int elements, uint8_t * input_data, uint
     }
 }
 
-physical_compressed_block symbolic_to_physical(symbolic_compressed_block * sc, __global ASTC_Encode *  ASTCEncode) {
+physical_compressed_block symbolic_to_physical(symbolic_compressed_block * sc, CMP_GLOBAL ASTC_Encode *  ASTCEncode) {
     int i, j;
     physical_compressed_block res;
 
@@ -10421,11 +10421,11 @@ physical_compressed_block symbolic_to_physical(symbolic_compressed_block * sc, _
 // ASTC use with OpenCL
 //---------------------
 #if defined(__OPENCL_VERSION__)
-__kernel void CMP_GPUEncoder(
-    __global unsigned char      *p_source_pixels,
-    __global unsigned char      *p_encoded_blocks,
-    __global Source_Info        *SourceInfo,
-    __global ASTC_Encode        *ASTCEncode
+CMP_KERNELvoid CMP_GPUEncoder(
+    CMP_GLOBAL unsigned char      *p_source_pixels,
+    CMP_GLOBAL unsigned char      *p_encoded_blocks,
+    CMP_GLOBAL Source_Info        *SourceInfo,
+    CMP_GLOBAL ASTC_Encode        *ASTCEncode
 ) {
     //=================================
     // Get the Thread workspace

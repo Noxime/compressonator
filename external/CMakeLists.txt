@@ -27,7 +27,7 @@ set(PATH_SUFFIXES lib)
 # ====================================================
 #                    C O M M O N
 # ====================================================
-find_package(Threads REQUIRED QUIET)
+# find_package(Threads REQUIRED QUIET)
 
 # ====================================================
 #                    C A T C H 2

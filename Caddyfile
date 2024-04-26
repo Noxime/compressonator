@@ -1,0 +1,10 @@
+localhost
+
+header {
+    +Cross-Origin-Embedder-Policy require-corp
+    +Cross-Origin-Opener-Policy same-origin
+}
+
+file_server browse {
+    root build/lib/
+}

@@ -105,7 +105,7 @@
 #define INC_cmp_math_func "cmp_math_func.h"
 #endif
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__EMSCRIPTEN__)
 #ifndef _LINUX
 #define _LINUX
 #endif

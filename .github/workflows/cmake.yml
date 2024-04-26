@@ -1,4 +1,4 @@
-name: CMake
+name: Emscripten
 
 on: [push]
 
@@ -25,6 +25,10 @@ jobs:
     - name: Sync external libs
       working-directory: ${{github.workspace}}/scripts
       run: python fetch_dependencies.py
+
+    - uses: lovasoa/setup-emscripten@master
+      with:
+        emscripten-version: '3.1.58'
   
     - name: Configure CMake
       # Use a bash shell so we can use the same syntax for environment variable
@@ -34,20 +38,23 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOPTION_ENABLE_ALL_APPS=OFF -DOPTION_BUILD_APPS_CMP_CLI=ON 
+      run: emcmake cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLIB_BUILD_CORE=ON -DLIB_BUILD_COMPRESSONATOR_SDK=ON -B build/ -G "Unix Makefiles"
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       shell: bash      
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE
+      run: make -j
+
+    - name: Link
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: emcc -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=134217728 -sASSERTIONS=1 -pthread -O3 -g lib/libCMP_Compressonator.a ../wasm-target.cpp -o lib/project.html
+
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v2
       with: 
-          name: compressonatlrCLI_64_Windows_Master_Build
-          path: ${{github.workspace}}/build/bin/Release
-
-
-
+          name: libs
+          path: ${{github.workspace}}/build/lib/
 

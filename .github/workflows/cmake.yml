@@ -26,9 +26,7 @@ jobs:
       working-directory: ${{github.workspace}}/scripts
       run: python fetch_dependencies.py
 
-    - uses: lovasoa/setup-emscripten@master
-      with:
-        emscripten-version: '3.1.58'
+    - uses: numworks/setup-emscripten@v1
   
     - name: Configure CMake
       # Use a bash shell so we can use the same syntax for environment variable
